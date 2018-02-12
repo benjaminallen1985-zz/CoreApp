@@ -6,6 +6,7 @@ using CoreApp.API.Data;
 using CoreApp.API.DTOs;
 using CoreApp.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CoreApp.API.Controllers
@@ -14,8 +15,10 @@ namespace CoreApp.API.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthRepository _repo;
-        public AuthController(IAuthRepository repo)
+        private readonly IConfiguration _config;
+        public AuthController(IAuthRepository repo, IConfiguration config)
         {
+            _config = config;
             _repo = repo;
         }
 
@@ -28,9 +31,9 @@ namespace CoreApp.API.Controllers
 
             if (await _repo.UserExists(userForRegisterDto.Username))
                 ModelState.TryAddModelError("Username", "Username already exists");
-            
+
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);            
+                return BadRequest(ModelState);
 
             var userToCreate = new User
             {
@@ -53,7 +56,7 @@ namespace CoreApp.API.Controllers
 
             // generate token
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = System.Text.Encoding.ASCII.GetBytes("Super Secret key. Extra Long Secret Key. going to save this first. Is this long enough.");
+            var key = System.Text.Encoding.ASCII.GetBytes(_config.GetSection("AppSettings:Token").Value);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -62,13 +65,13 @@ namespace CoreApp.API.Controllers
                     new Claim(ClaimTypes.Name, userFromRepo.Username)
                 }),
                 Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), 
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha512Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok( new {tokenString});
+            return Ok(new { tokenString });
         }
 
     }

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CoreApp.API.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CoreApp.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
@@ -18,6 +20,7 @@ namespace CoreApp.API.Controllers
             _context = context;
 
         }
+        
         // GET api/values
         [HttpGet]
         public async Task<IActionResult> GetValues()
