@@ -4,3 +4,4 @@ obj
 *.db.sqbpro
 launch.json
 tasks.json
+.vscode
