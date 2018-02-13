@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CoreApp.API.Data;
 using CoreApp.API.DTOs;
 using CoreApp.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
